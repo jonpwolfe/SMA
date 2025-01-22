@@ -7,9 +7,13 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.service.CustomUserDetailsService;
 
@@ -18,19 +22,42 @@ import com.example.service.CustomUserDetailsService;
 public class SecurityConfig {
 
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/index.html","/").permitAll() //Allow access to home page
-                .anyRequest().authenticated()                 // Require authentication for all other requests
-            );
-                                               
-            
-        return http.build();
-    }
+	 @Bean
+	 SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	        http
+	            // CORS configuration: Allow cross-origin requests
+	            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+	            
+	            // CSRF configuration: Disable CSRF for stateless APIs (use JWT, for example)
+	            .csrf(csrf -> csrf.disable())
 
+	            .authorizeHttpRequests(authz -> authz
+	                .requestMatchers("/index.html", "/", "/auth/**").permitAll() // Public endpoints
+	                .anyRequest().authenticated() // Require authentication for all other requests
+	            )
+	            // Session management configuration
+	            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+	        return http.build();
+	    }
+
+	    @Bean
+	    CorsConfigurationSource corsConfigurationSource() {
+	       CorsConfiguration config = new CorsConfiguration();
+	        config.addAllowedOrigin("http://localhost:4200"); // Allow Angular app to send requests
+	        config.addAllowedMethod("GET");
+	        config.addAllowedMethod("POST");
+	        config.addAllowedMethod("PUT");
+	        config.addAllowedMethod("DELETE");
+	        config.addAllowedMethod("OPTIONS");
+	        config.addAllowedHeader("*"); // Allow all headers
+	        config.setAllowCredentials(true); // Allow credentials (cookies, etc.)
+
+	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	        source.registerCorsConfiguration("/**", config);
+
+	        return source;
+	    }
         @Bean
         AuthenticationManager authenticationManager(
                 CustomUserDetailsService userDetailsService,

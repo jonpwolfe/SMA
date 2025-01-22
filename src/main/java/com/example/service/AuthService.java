@@ -45,22 +45,42 @@ public class AuthService {
         // Save user to the database
         userRepository.save(user);
     }
-
-    // Authenticate user and set JWT cookie
     public void loginUser(LoginRequest loginRequest, HttpServletResponse response) {
-        // Authenticate user using AuthenticationManager
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
-        );
+        try {
+            // Authenticate user using AuthenticationManager
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.getUsername(),
+                    loginRequest.getPassword()
+                )
+            );
 
-        // Generate JWT token
-        String jwtToken = jwtUtils.generateToken(authentication);
+            // Generate JWT token
+            String jwtToken = jwtUtils.generateToken(authentication);
 
-        // Add JWT token to response as an HttpOnly cookie
-        Cookie jwtCookie = jwtUtils.createJwtCookie(jwtToken);
-        response.addCookie(jwtCookie);
+            // Add JWT token to response as an HttpOnly cookie
+            Cookie jwtCookie = createJwtCookie(jwtToken);
+            response.addCookie(jwtCookie);
+
+        } catch (Exception e) {
+            // Handle authentication failure
+            throw new RuntimeException("Invalid username or password: " + e.getMessage(), e);
+        }
     }
+
+    /**
+     * Creates an HttpOnly cookie for the JWT token.
+     *
+     * @param jwtToken The JWT token to store in the cookie.
+     * @return A Cookie object configured with HttpOnly and Secure settings.
+     */
+    private Cookie createJwtCookie(String jwtToken) {
+        Cookie jwtCookie = new Cookie("authToken", jwtToken);
+        jwtCookie.setHttpOnly(true); // Prevent access via JavaScript
+        jwtCookie.setSecure(false); // Use true in production to enforce HTTPS
+        jwtCookie.setPath("/"); // Available for all endpoints
+        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Set expiration (7 days)
+        return jwtCookie;
+    }
+
 }
