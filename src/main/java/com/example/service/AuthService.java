@@ -1,25 +1,29 @@
 package com.example.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import com.example.model.LoginRequest;
-import com.example.model.User;
-import com.example.repository.UserRepository;
+
 import com.example.util.JwtUtils;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class AuthService {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+	
     @Autowired
-    private UserRepository userRepository;
+    private CustomUserDetailsService userDetailsService;
    
     
     @Autowired
@@ -33,21 +37,18 @@ public class AuthService {
 
     // Register a new user
     public void registerUser(LoginRequest loginRequest) {
-        // Check if username already exists
-        if (userRepository.findByUsername(loginRequest.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already taken");
-        }
-
+    	userDetailsService.checkUsernameExists(loginRequest);
         // Create a new user and encode the password
-        User user = new User();
-        user.setUsername(loginRequest.getUsername());
-        user.setPassword((passwordEncoder.encode(loginRequest.getPassword())));
-        // Save user to the database
-        userRepository.save(user);
+        userDetailsService.CreateUser(loginRequest.getUsername(), passwordEncoder.encode(loginRequest.getPassword()));;
     }
-    public void loginUser(LoginRequest loginRequest, HttpServletResponse response) {
+    // Login method that returns ResponseEntity
+    // Login method that generates JWT and returns an HTTP-only cookie
+    public Cookie loginUser(LoginRequest loginRequest) {
         try {
-            // Authenticate user using AuthenticationManager
+            // Log the attempt to authenticate
+            logger.info("Attempting to authenticate user: {}", loginRequest.getUsername());
+
+            // Authenticate the user with the provided credentials
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.getUsername(),
@@ -55,16 +56,26 @@ public class AuthService {
                 )
             );
 
+            // Log successful authentication
+            logger.info("Authentication successful for user: {}", loginRequest.getUsername());
+
             // Generate JWT token
             String jwtToken = jwtUtils.generateToken(authentication);
+            logger.info("JWT token generated for user: {}", loginRequest.getUsername());
 
-            // Add JWT token to response as an HttpOnly cookie
+            // Create a cookie with the JWT token
             Cookie jwtCookie = createJwtCookie(jwtToken);
-            response.addCookie(jwtCookie);
+            logger.info("JWT cookie created for user: {}", loginRequest.getUsername());
 
+            // Return the cookie
+            return jwtCookie;
+
+        } catch (BadCredentialsException e) {
+            logger.error("Invalid username or password for user: {}", loginRequest.getUsername());
+            throw new RuntimeException("Invalid username or password", e);
         } catch (Exception e) {
-            // Handle authentication failure
-            throw new RuntimeException("Invalid username or password: " + e.getMessage(), e);
+            logger.error("An unexpected error occurred during login for user: {}", loginRequest.getUsername(), e);
+            throw new RuntimeException("Login failed", e);
         }
     }
 

@@ -31,30 +31,22 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
         }
     }
+;
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = "application/json")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         try {
-            // Delegate the login logic and cookie creation to AuthService
-            authService.loginUser(loginRequest, response);
+            // Call the AuthService to authenticate and generate the JWT token as a cookie
+            Cookie jwtCookie = authService.loginUser(loginRequest);
 
+            // Add the JWT cookie to the response
+            response.addCookie(jwtCookie);
+
+            // Return a success response with 200 OK status
             return ResponseEntity.ok("User logged in successfully");
         } catch (Exception e) {
+            // Return 401 Unauthorized if login fails
             return ResponseEntity.status(401).body("Login failed: " + e.getMessage());
         }
-    }
-
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletResponse response) {
-        // Invalidate the cookie by setting its maxAge to 0
-        Cookie cookie = new Cookie("authToken", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // Use true in production
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // Remove cookie immediately
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok("User logged out successfully");
     }
 }

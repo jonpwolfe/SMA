@@ -5,17 +5,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -41,39 +42,29 @@ public class SecurityConfig {
 	        return http.build();
 	    }
 
-	    @Bean
-	    CorsConfigurationSource corsConfigurationSource() {
-	       CorsConfiguration config = new CorsConfiguration();
-	        config.addAllowedOrigin("http://localhost:4200"); // Allow Angular app to send requests
-	        config.addAllowedMethod("GET");
-	        config.addAllowedMethod("POST");
-	        config.addAllowedMethod("PUT");
-	        config.addAllowedMethod("DELETE");
-	        config.addAllowedMethod("OPTIONS");
-	        config.addAllowedHeader("*"); // Allow all headers
-	        config.setAllowCredentials(true); // Allow credentials (cookies, etc.)
+	     @Bean
+	     public CorsConfigurationSource corsConfigurationSource() {
+	         CorsConfiguration corsConfig = new CorsConfiguration();
+	         corsConfig.addAllowedOrigin("http://localhost:4200");  // Allow requests from Angular frontend
+	         corsConfig.addAllowedMethod(CorsConfiguration.ALL);  // Allow all HTTP methods (GET, POST, PUT, DELETE)
+	         corsConfig.addAllowedHeader(CorsConfiguration.ALL);  // Allow all headers
+	         corsConfig.setAllowCredentials(true);  // Allow credentials (cookies, authorization headers, etc.)
 
-	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	        source.registerCorsConfiguration("/**", config);
+	         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	         source.registerCorsConfiguration("/**", corsConfig);
 
-	        return source;
-	    }
-        @Bean
-        AuthenticationManager authenticationManager(
-                CustomUserDetailsService userDetailsService,
-                PasswordEncoder passwordEncoder) {
-            DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-            authenticationProvider.setUserDetailsService(userDetailsService);
-            authenticationProvider.setPasswordEncoder(passwordEncoder);
+	         return source;
+	     }
 
-            return new ProviderManager(authenticationProvider);
-        }
+	     @Bean
+	     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) throws Exception {
+	         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+	         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+	         return authenticationManagerBuilder.build();
+	     }
 
-   
-
-        @Bean
-        PasswordEncoder passwordEncoder() {
-            return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        }
-
-    }
+	     @Bean
+	     public PasswordEncoder passwordEncoder() {
+	         return new BCryptPasswordEncoder();  // Use BCrypt for password encoding
+	     }
+	 }

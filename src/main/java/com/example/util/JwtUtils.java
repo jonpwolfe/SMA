@@ -1,8 +1,10 @@
 package com.example.util;
 
+import java.security.Key;
 import java.util.Date;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.example.config.JwtProperties;
@@ -17,22 +19,18 @@ import jakarta.servlet.http.Cookie;
 public class JwtUtils {
 
     private final JwtProperties jwtProperties;
-
+    private static final Key SIGNING_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     public JwtUtils(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
     }
 
-    // Generate JWT Token
     public String generateToken(Authentication authentication) {
-        String username = authentication.getName();
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtProperties.getExpiration());
-
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes()), SignatureAlgorithm.HS512)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration()))
+                .signWith(SIGNING_KEY)  // Use the strong key
                 .compact();
     }
 

@@ -5,6 +5,10 @@ public class LoginRequest {
     private String username;
     private String password;  // Plain-text password submitted by the user
 
+    public LoginRequest(String username, String password) {
+    	this.username = username;
+    	this.password = password;
+    }
     // Getters and Setters
     public String getUsername() {
         return username;
