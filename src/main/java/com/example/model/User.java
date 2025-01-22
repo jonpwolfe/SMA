@@ -67,4 +67,8 @@ public class User {
 		this.getLoginToken().setPassword(encode);
 		
 	}
-}
+	public void setUsernameAndPassword(String username, String password) {
+		this.setUsername(username);
+		this.setPassword(password);
+	}
+	}

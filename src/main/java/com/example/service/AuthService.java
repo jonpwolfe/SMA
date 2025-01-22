@@ -39,9 +39,7 @@ public class AuthService {
 
         // Create a new user and encode the password
         User user = new User();
-        user.setUsername(loginRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
-
+        user.setUsernameAndPassword(loginRequest.getUsername(),passwordEncoder.encode(loginRequest.getPassword()));
         // Save user to the database
         userRepository.save(user);
     }
