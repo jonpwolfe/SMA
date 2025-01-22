@@ -28,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getLoginToken().getHashedPassword();
+        return user.getPassword();
     }
 
     @Override
@@ -56,8 +56,5 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
     
-    public boolean verifyPassword(String rawPassword) {
-        return user.getLoginToken().verifyPassword(rawPassword);
-    }
     
 }

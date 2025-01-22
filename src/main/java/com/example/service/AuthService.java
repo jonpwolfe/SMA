@@ -20,7 +20,8 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
-
+   
+    
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -39,7 +40,8 @@ public class AuthService {
 
         // Create a new user and encode the password
         User user = new User();
-        user.setUsernameAndPassword(loginRequest.getUsername(),passwordEncoder.encode(loginRequest.getPassword()));
+        user.setUsername(loginRequest.getUsername());
+        user.setPassword((passwordEncoder.encode(loginRequest.getPassword())));
         // Save user to the database
         userRepository.save(user);
     }

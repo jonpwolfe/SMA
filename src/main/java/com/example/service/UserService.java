@@ -5,7 +5,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.model.LoginRequest;
-import com.example.model.LoginToken;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 
@@ -31,7 +30,7 @@ public class UserService {
         // Create a new User object
         User newUser = new User();
         newUser.setUsername(loginRequest.getUsername());
-        newUser.setLoginToken(new LoginToken(encodedPassword)); // Set the encoded password
+        newUser.setPassword(encodedPassword); // Set the encoded password
 
         // Save the user to the repository
         return userRepository.save(newUser);

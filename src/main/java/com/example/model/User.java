@@ -26,10 +26,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @OneToOne(cascade = CascadeType.ALL)  // One-to-one relationship, cascade all operations (e.g., save, delete)
-    @JoinColumn(name = "login_token_id")  // Foreign key to the LoginToken table
-    private LoginToken loginToken;
-    
+    @Column(nullable = false)  // Foreign key to the LoginToken table
+    private String password;
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "role")
     private List<String> roles = new ArrayList<>();
@@ -47,12 +45,12 @@ public class User {
         this.username = username;
     }
 
-    public LoginToken getLoginToken() {
-        return loginToken;
+    public String getPassword() {
+        return password;
     }
 
-    public void setLoginToken(LoginToken loginToken) {
-        this.loginToken = loginToken;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<String> getRoles() {
@@ -62,13 +60,4 @@ public class User {
     public void setRoles(List<String> roles) {
         this.roles = new ArrayList<>(roles); // Use a copy for immutability
     }
-
-	public void setPassword(String encode) {
-		this.getLoginToken().setPassword(encode);
-		
-	}
-	public void setUsernameAndPassword(String username, String password) {
-		this.setUsername(username);
-		this.setPassword(password);
-	}
 	}
