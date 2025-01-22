@@ -1,7 +1,6 @@
 package com.example.model;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,6 +35,9 @@ public class LoginToken {
     public String getHashedPassword() {
         return hashedPassword;
     }
+    private void setHashedPassword(String hashedPassword) {
+    	this.hashedPassword = hashedPassword;
+    }
 
     public String getSalt() {
         return salt;
@@ -65,5 +67,9 @@ public class LoginToken {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error hashing password", e);
         }
+    }
+    public void setPassword(String password) {
+    	this.setHashedPassword(this.hashPassword(password, this.getSalt()));
+    	
     }
 }
