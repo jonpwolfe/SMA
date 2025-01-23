@@ -23,7 +23,7 @@ public class RegistrationController {
 		public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
 	    	try {
 	    		registrationService.registerUser(registrationRequest);
-	            return ResponseEntity.status(201).body("User registered successfully");
+	            return ResponseEntity.status(201).body("User "+registrationRequest.getUsername()+" registered successfully");
 	        } catch (Exception e) {
 	            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
 	        }

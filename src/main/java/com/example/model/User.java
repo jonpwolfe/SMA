@@ -69,4 +69,5 @@ public class User {
     public void setRoles(List<String> roles) {
         this.roles = new ArrayList<>(roles); // Use a copy for immutability
     }
-	}
+    
+}
