@@ -22,7 +22,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/register")
+    @PostMapping(value ="/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<String> registerUser(@RequestBody LoginRequest loginRequest) {
         try {
             authService.registerUser(loginRequest);
@@ -33,7 +33,7 @@ public class AuthController {
     }
 ;
 
-    @PostMapping(value = "/login", consumes = "application/json")
+    @PostMapping(value = "/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         try {
             // Call the AuthService to authenticate and generate the JWT token as a cookie
