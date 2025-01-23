@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.example.model.LoginRequest;
-import com.example.service.AuthService;
+import com.example.service.RegistrationService;
 
 
 @Component
@@ -15,12 +15,12 @@ import com.example.service.AuthService;
 public class DevUserRunner implements ApplicationRunner {
 
     @Autowired
-    private AuthService authService;
+    private RegistrationService registrationService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
     		LoginRequest loginRequest = new LoginRequest("jon", "123");
-        	authService.registerUser(loginRequest);
+        	registrationService.registerUser(loginRequest);
             System.out.println("Development user created: jon");
         }
     }

@@ -22,17 +22,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping(value ="/register", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> registerUser(@RequestBody LoginRequest loginRequest) {
-        try {
-            authService.registerUser(loginRequest);
-            return ResponseEntity.status(201).body("User registered successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
-        }
-    }
-;
-
+  
     @PostMapping(value = "/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         try {

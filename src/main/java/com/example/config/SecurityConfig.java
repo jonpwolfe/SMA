@@ -31,7 +31,7 @@ public class SecurityConfig {
 	            .csrf(csrf -> csrf.disable())
 
 	            .authorizeHttpRequests(authz -> authz
-	                .requestMatchers("/index.html", "/", "/auth/**").permitAll() // Public endpoints
+	                .requestMatchers("/index.html", "/","/register" ,"/auth/**").permitAll() // Public endpoints
 	                .anyRequest().authenticated() // Require authentication for all other requests
 	            )
 	            // Session management configuration

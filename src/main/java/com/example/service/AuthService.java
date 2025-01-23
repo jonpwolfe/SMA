@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -21,12 +20,6 @@ import jakarta.servlet.http.Cookie;
 public class AuthService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-	
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
- 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -34,13 +27,7 @@ public class AuthService {
     @Autowired
     private JwtUtils jwtUtils;
 
-    // Register a new user
-    public void registerUser(LoginRequest loginRequest) {
-    	userDetailsService.checkUsernameExists(loginRequest);
-        // Create a new user and encode the password
-        userDetailsService.CreateUser(loginRequest.getUsername(), passwordEncoder.encode(loginRequest.getPassword()));;
-        logger.info("Registered user: {}", loginRequest.getUsername());
-    }
+   
     // Login method that returns ResponseEntity
     // Login method that generates JWT and returns an HTTP-only cookie
     public Cookie loginUser(LoginRequest loginRequest) {
