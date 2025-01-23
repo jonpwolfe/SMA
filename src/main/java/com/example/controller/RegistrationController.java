@@ -13,16 +13,16 @@ import com.example.service.RegistrationService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true") // Enable credentials
-@RequestMapping("/")
+@RequestMapping
 public class RegistrationController {
 	
 	@Autowired
 	RegistrationService registrationService;
 	
-	  @PostMapping(value ="register", consumes = "application/json", produces = "application/json")
-	    public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
-	        try {
-	            registrationService.registerUser(registrationRequest);
+	@PostMapping(value ="/register", consumes = "application/json", produces = "application/json")
+		public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
+	    	try {
+	    		registrationService.registerUser(registrationRequest);
 	            return ResponseEntity.status(201).body("User registered successfully");
 	        } catch (Exception e) {
 	            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
