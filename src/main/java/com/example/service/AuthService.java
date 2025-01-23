@@ -24,8 +24,7 @@ public class AuthService {
 	
     @Autowired
     private CustomUserDetailsService userDetailsService;
-   
-    
+ 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -40,6 +39,7 @@ public class AuthService {
     	userDetailsService.checkUsernameExists(loginRequest);
         // Create a new user and encode the password
         userDetailsService.CreateUser(loginRequest.getUsername(), passwordEncoder.encode(loginRequest.getPassword()));;
+        logger.info("Registered user: {}", loginRequest.getUsername());
     }
     // Login method that returns ResponseEntity
     // Login method that generates JWT and returns an HTTP-only cookie
