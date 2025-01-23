@@ -28,6 +28,6 @@ public class RegistrationService {
         userDetailsService.CreateUser(registrationRequest.getUsername(), passwordEncoder.encode(registrationRequest.getPassword()),registrationRequest.getName());;
         
         //Log successful registration
-        logger.info("Registered user: '{}", registrationRequest.getUsername(), "' with name: {}",registrationRequest.getName());
+        logger.info("Registered user: '"+registrationRequest.getUsername()+"' with name: '"+registrationRequest.getName()+"'");
     }
 }
