@@ -25,6 +25,10 @@ public class User {
 
     @Column(nullable = false)  // Foreign key to the LoginToken table
     private String password;
+    
+    @Column(nullable = false)
+    private String name;
+    
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "role")
     private List<String> roles = new ArrayList<>();
@@ -50,6 +54,14 @@ public class User {
         this.password = password;
     }
 
+    public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
     public List<String> getRoles() {
         return new ArrayList<>(roles); // Return a copy for immutability
     }

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.model.CustomUserDetails;
-import com.example.model.LoginRequest;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 
@@ -42,18 +41,20 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(user);
     }
 
-    public boolean checkUsernameExists(LoginRequest loginRequest) {
+    public boolean checkUsernameExists(String username) {
     // Check if username already exists
-    if (userRepository.findByUsername(loginRequest.getUsername()).isPresent()) {
+    if (userRepository.findByUsername(username).isPresent()) {
         return true;
     }else
     	return false;
     }
-    public void CreateUser(String username, String password) {
+    
+    public void CreateUser(String username, String password, String name) {
        // Create a new user and encode the password
     User user = new User();
     user.setUsername(username);
     user.setPassword(password);
+    user.setName(name);
     // Save user to the database
     userRepository.save(user);
 }

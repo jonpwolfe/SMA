@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.model.LoginRequest;
+import com.example.model.RegistrationRequest;
 import com.example.service.RegistrationService;
 
 @RestController
@@ -20,9 +20,9 @@ public class RegistrationController {
 	RegistrationService registrationService;
 	
 	  @PostMapping(value ="register", consumes = "application/json", produces = "application/json")
-	    public ResponseEntity<String> registerUser(@RequestBody LoginRequest loginRequest) {
+	    public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
 	        try {
-	            registrationService.registerUser(loginRequest);
+	            registrationService.registerUser(registrationRequest);
 	            return ResponseEntity.status(201).body("User registered successfully");
 	        } catch (Exception e) {
 	            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());

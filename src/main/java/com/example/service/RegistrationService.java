@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.model.LoginRequest;
+import com.example.model.RegistrationRequest;
 
 @Service
 public class RegistrationService {
@@ -20,14 +20,14 @@ public class RegistrationService {
 	private PasswordEncoder passwordEncoder;
 	 
 	 // Register a new user
-    public void registerUser(LoginRequest loginRequest) {
+    public void registerUser(RegistrationRequest registrationRequest) {
     	//check if username exists
-    	userDetailsService.checkUsernameExists(loginRequest);
+    	userDetailsService.checkUsernameExists(registrationRequest.getUsername());
     	
         // Create a new user and encode the password
-        userDetailsService.CreateUser(loginRequest.getUsername(), passwordEncoder.encode(loginRequest.getPassword()));;
+        userDetailsService.CreateUser(registrationRequest.getUsername(), passwordEncoder.encode(registrationRequest.getPassword()),registrationRequest.getName());;
         
         //Log successful registration
-        logger.info("Registered user: {}", loginRequest.getUsername());
+        logger.info("Registered user: {}", registrationRequest.getUsername());
     }
 }

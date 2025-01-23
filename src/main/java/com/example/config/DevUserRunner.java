@@ -6,7 +6,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import com.example.model.LoginRequest;
+import com.example.model.RegistrationRequest;
 import com.example.service.RegistrationService;
 
 
@@ -19,8 +19,8 @@ public class DevUserRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-    		LoginRequest loginRequest = new LoginRequest("jon", "123");
-        	registrationService.registerUser(loginRequest);
+    		RegistrationRequest registrationRequest = new RegistrationRequest("jon", "123", "Jonathan");
+        	registrationService.registerUser(registrationRequest);
             System.out.println("Development user created: jon");
         }
     }
