@@ -22,7 +22,9 @@ public class RegistrationController {
 	@PostMapping(value ="/register", consumes = "application/json", produces = "application/json")
 		public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
 	    	try {
-	    		registrationService.registerUser(registrationRequest);
+	    		if(!registrationService.registerUser(registrationRequest)) {
+	    			return ResponseEntity.badRequest().body("Registration Failed");
+	    		}
 	            return ResponseEntity.status(201).body("User "+registrationRequest.getUsername()+" registered successfully");
 	        } catch (Exception e) {
 	            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());

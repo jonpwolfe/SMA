@@ -20,14 +20,20 @@ public class RegistrationService {
 	private PasswordEncoder passwordEncoder;
 	 
 	 // Register a new user
-    public void registerUser(RegistrationRequest registrationRequest) {
+    public boolean registerUser(RegistrationRequest registrationRequest) {
     	//check if username exists
-    	userDetailsService.checkUsernameExists(registrationRequest.getUsername());
+    	if(!userDetailsService.checkUsernameExists(registrationRequest.getUsername())) {
     	
-        // Create a new user and encode the password
-        userDetailsService.CreateUser(registrationRequest.getUsername(), passwordEncoder.encode(registrationRequest.getPassword()),registrationRequest.getName());;
+    		// Create a new user and encode the password
+    		userDetailsService.CreateUser(registrationRequest.getUsername(), passwordEncoder.encode(registrationRequest.getPassword()),registrationRequest.getName());;
         
-        //Log successful registration
-        logger.info("Registered user: '"+registrationRequest.getUsername()+"' with name: '"+registrationRequest.getName()+"'");
+    		//Log successful registration
+    		logger.info("Registered user: '"+registrationRequest.getUsername()+"' with name: '"+registrationRequest.getName()+"'");
+    		return true;
+    	}
+    	else {
+    		logger.info("Registration of user: '"+registrationRequest.getUsername()+"' failed");
+    		return false;
+    	}
     }
 }
