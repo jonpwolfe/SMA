@@ -3,8 +3,6 @@ package com.example.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -43,7 +41,7 @@ public class SecurityConfig {
 	    }
 
 	     @Bean
-	     public CorsConfigurationSource corsConfigurationSource() {
+	     CorsConfigurationSource corsConfigurationSource() {
 	         CorsConfiguration corsConfig = new CorsConfiguration();
 	         corsConfig.addAllowedOrigin("http://localhost:4200");  // Allow requests from Angular frontend
 	         corsConfig.addAllowedMethod(CorsConfiguration.ALL);  // Allow all HTTP methods (GET, POST, PUT, DELETE)
@@ -57,14 +55,14 @@ public class SecurityConfig {
 	     }
 
 	     @Bean
-	     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) throws Exception {
+	     AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) throws Exception {
 	         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
 	         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
 	         return authenticationManagerBuilder.build();
 	     }
 
 	     @Bean
-	     public PasswordEncoder passwordEncoder() {
+	     PasswordEncoder passwordEncoder() {
 	         return new BCryptPasswordEncoder();  // Use BCrypt for password encoding
 	     }
 	 }
