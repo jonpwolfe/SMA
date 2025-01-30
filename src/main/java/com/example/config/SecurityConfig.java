@@ -11,34 +11,47 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
+import com.example.filter.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	
+	public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+	}
+	
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+	    http
+	        // Enable CORS with the custom configuration
+	        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+	        
+	        // Disable CSRF for stateless JWT-based APIs
+	        .csrf(csrf -> csrf.disable())
 
+	        // Authorization rules
+	        .authorizeHttpRequests(authz -> authz
+	            .requestMatchers("/index.html", "/", "/auth/**", "/register").permitAll() // Public endpoints
+	            .requestMatchers("/user").authenticated() // Secure /user endpoint
+	            .anyRequest().authenticated() // Secure all other endpoints
+	        )
+	        
+	        // Stateless session management for APIs
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        
+	        // Add the JWT authentication filter before the default username/password filter
+	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-	 @Bean
-	 SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	        http
-	            // CORS configuration: Allow cross-origin requests
-	            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-	            
-	            // CSRF configuration: Disable CSRF for stateless APIs (use JWT, for example)
-	            .csrf(csrf -> csrf.disable())
+	    return http.build();
+	}
 
-	            .authorizeHttpRequests(authz -> authz
-	                .requestMatchers("/index.html", "/","/register" ,"/auth/**").permitAll() // Public endpoints
-	                .anyRequest().authenticated() // Require authentication for all other requests
-	            )
-	            // Session management configuration
-	            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-	        return http.build();
-	    }
 
 	     @Bean
 	     CorsConfigurationSource corsConfigurationSource() {

@@ -1,5 +1,8 @@
 package com.example.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,19 +27,28 @@ public class AuthController {
 
   
     @PostMapping(value = "/login", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         try {
             // Call the AuthService to authenticate and generate the JWT token as a cookie
             Cookie jwtCookie = authService.loginUser(loginRequest);
 
             // Add the JWT cookie to the response
-            response.addCookie(jwtCookie);
+            String cookieHeader = String.format("%s=%s; Path=%s; HttpOnly; SameSite=Lax", 
+                    jwtCookie.getName(), jwtCookie.getValue(), jwtCookie.getPath());
+                
+            response.addHeader("Set-Cookie",cookieHeader);
 
-            // Return a success response with 200 OK status
-            return ResponseEntity.ok("User logged in successfully");
+            // Prepare a JSON response
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("message", "User logged in successfully");
+
+            // Return the response as JSON
+            return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
-            // Return 401 Unauthorized if login fails
-            return ResponseEntity.status(401).body("Login failed: " + e.getMessage());
+            // Return 401 Unauthorized if login fails with a proper JSON error message
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Login failed: " + e.getMessage());
+            return ResponseEntity.status(401).body(errorResponse);
         }
     }
 }

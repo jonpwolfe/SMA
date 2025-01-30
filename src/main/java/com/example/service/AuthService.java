@@ -48,6 +48,7 @@ public class AuthService {
 
             // Generate JWT token
             String jwtToken = jwtUtils.generateToken(authentication);
+            logger.info("token = "+jwtToken);
             logger.info("JWT token generated for user: {}", loginRequest.getUsername());
 
             // Create a cookie with the JWT token
@@ -78,6 +79,7 @@ public class AuthService {
         jwtCookie.setSecure(false); // Use true in production to enforce HTTPS
         jwtCookie.setPath("/"); // Available for all endpoints
         jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Set expiration (7 days)
+        jwtCookie.setDomain("localhost");
         return jwtCookie;
     }
 

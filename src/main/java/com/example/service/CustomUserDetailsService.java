@@ -12,6 +12,11 @@ import org.slf4j.LoggerFactory;
 import com.example.model.CustomUserDetails;
 import com.example.model.User;
 import com.example.repository.UserRepository;
+import com.example.util.JwtUtils;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureException;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -20,7 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private JwtUtils jwtUtils;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Log the attempt to load a user by username
@@ -43,19 +49,47 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public boolean checkUsernameExists(String username) {
     // Check if username already exists
+    	logger.info("Attempting to check if "+username+" exists");
+
     if (userRepository.findByUsername(username).isPresent()) {
+    	logger.info(username+"exists");
+
         return true;
     }else
+    	logger.info(username+"does not exist");
     	return false;
     }
     
     public void CreateUser(String username, String password, String name) {
-       // Create a new user and encode the password
-    User user = new User();
-    user.setUsername(username);
-    user.setPassword(password);
-    user.setName(name);
-    // Save user to the database
-    userRepository.save(user);
+        // Create a new user and encode the password
+    	User user = new User();
+    	user.setUsername(username);
+    	user.setPassword(password);
+    	user.setName(name);
+    	// Log the event
+    	logger.info("Attempting to save "+user.toString()+" to repository");
+    	// Save user to the database
+    	userRepository.save(user);
 }
+   public void CreateUser(User user) {
+	    // Log the event
+	   logger.info("Attempting to save "+user.toString()+" to repository");
+	   // Save user to the database
+	   userRepository.save(user);
+   }
+
+   public User getUserByAuthToken(String authToken) {
+      String username = jwtUtils.getUsernameFromToken(authToken);
+       Optional<User> optionalUser = userRepository.findByUsername(username);
+       if (!optionalUser.isPresent()) {
+           // Log the error for better tracking
+           logger.error("User with username '{}' not found", username);
+           throw new UsernameNotFoundException("User with username '" + username + "' not found");
+       }
+
+       // Return the custom user details object
+       return optionalUser.get(); // return the user from the Optional
+       
+       
+   }
 }

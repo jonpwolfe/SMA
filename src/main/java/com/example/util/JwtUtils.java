@@ -30,7 +30,7 @@ public class JwtUtils {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration()))
-                .signWith(SIGNING_KEY)  // Use the strong key
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes()))  // Use the strong key
                 .compact();
     }
 
@@ -55,7 +55,6 @@ public class JwtUtils {
             return false;
         }
     }
-
     // Extract username from the JWT token
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
