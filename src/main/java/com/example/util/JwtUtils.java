@@ -18,10 +18,11 @@ import jakarta.servlet.http.Cookie;
 @Component
 public class JwtUtils {
 
-    private final JwtProperties jwtProperties;
-    private static final Key SIGNING_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private  JwtProperties jwtProperties;
+    private static Key SIGNING_KEY;
     public JwtUtils(JwtProperties jwtProperties) {
-        this.jwtProperties = jwtProperties;
+    	this.jwtProperties = jwtProperties;
+    	JwtUtils.SIGNING_KEY =Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
     public String generateToken(Authentication authentication) {
@@ -30,7 +31,7 @@ public class JwtUtils {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration()))
-                .signWith(Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes()))  // Use the strong key
+                .signWith(SIGNING_KEY)  // Use the strong key
                 .compact();
     }
 
@@ -47,7 +48,7 @@ public class JwtUtils {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes()))
+                .setSigningKey(SIGNING_KEY)
                 .build()
                 .parseClaimsJws(token);
             return true;
@@ -58,7 +59,7 @@ public class JwtUtils {
     // Extract username from the JWT token
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes()))
+                .setSigningKey(SIGNING_KEY)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
