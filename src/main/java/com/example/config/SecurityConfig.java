@@ -36,21 +36,23 @@ public class SecurityConfig {
 	        // Disable CSRF for stateless JWT-based APIs
 	        .csrf(csrf -> csrf.disable())
 
-	        // Authorization rules
+	        // Authorization rules for public and secure routes
 	        .authorizeHttpRequests(authz -> authz
-	            .requestMatchers("/index.html", "/", "/auth/**", "/register").permitAll() // Public endpoints
-	            .requestMatchers("/user").authenticated() // Secure /user endpoint
-	            .anyRequest().authenticated() // Secure all other endpoints
+	            .requestMatchers("/index.html", "/", "/auth/**", "/register").permitAll()  // Public endpoints like login
+	            .requestMatchers("/user").authenticated()  // Secure /user endpoint
+	            .anyRequest().authenticated()  // Secure all other endpoints
 	        )
 	        
 	        // Stateless session management for APIs
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-	        
+	    
 	        // Add the JWT authentication filter before the default username/password filter
 	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 	    return http.build();
 	}
+
+
 
 
 	     @Bean

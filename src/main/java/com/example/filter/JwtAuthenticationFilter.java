@@ -33,7 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-    		String jwt = parseJwtFromCookies(request);
+    	  
+      String jwt = parseJwtFromCookies(request);
            
             try {
                 String username = jwtUtils.getUsernameFromToken(jwt); // Extract username from JWT
