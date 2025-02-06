@@ -14,10 +14,6 @@ import com.example.model.User;
 import com.example.repository.UserRepository;
 import com.example.util.JwtUtils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureException;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 

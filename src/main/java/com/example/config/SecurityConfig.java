@@ -21,14 +21,14 @@ import com.example.filter.JwtAuthenticationFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 	
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private JwtAuthenticationFilter jwtAuthenticationFilter;
 	
 	public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 	}
 	
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	    http
 	        // Enable CORS with the custom configuration
 	        .cors(cors -> cors.configurationSource(corsConfigurationSource()))

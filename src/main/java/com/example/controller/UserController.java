@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.model.User;
-import com.example.service.AuthService;
 import com.example.service.CustomUserDetailsService;
 
 @RestController
@@ -25,9 +24,6 @@ public class UserController {
 
     @GetMapping(produces="application/json")
     public ResponseEntity<User> getUserByCookie(@CookieValue(name = "authToken", required = false) String authToken) {
-        // Create a logger instance
-        Logger logger = LoggerFactory.getLogger(getClass());
-
         try {
             // Log the incoming auth token
             logger.info("Received authToken: {}", authToken);
