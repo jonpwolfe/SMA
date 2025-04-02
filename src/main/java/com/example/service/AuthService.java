@@ -30,7 +30,7 @@ public class AuthService {
    
     // Login method that returns ResponseEntity
     // Login method that generates JWT and returns an HTTP-only cookie
-    public Cookie loginUser(LoginRequest loginRequest) {
+    public String loginUser(LoginRequest loginRequest) {
         try {
             // Log the attempt to authenticate
             logger.info("Attempting to authenticate user: {}", loginRequest.getUsername());
@@ -51,12 +51,8 @@ public class AuthService {
             logger.info("token = "+jwtToken);
             logger.info("JWT token generated for user: {}", loginRequest.getUsername());
 
-            // Create a cookie with the JWT token
-            Cookie jwtCookie = createJwtCookie(jwtToken);
-            logger.info("JWT cookie created for user: {}", loginRequest.getUsername());
-
             // Return the cookie
-            return jwtCookie;
+            return jwtToken;
 
         } catch (BadCredentialsException e) {
             logger.error("Invalid username or password for user: {}", loginRequest.getUsername());
@@ -65,22 +61,6 @@ public class AuthService {
             logger.error("An unexpected error occurred during login for user: {}", loginRequest.getUsername(), e);
             throw new RuntimeException("Login failed", e);
         }
-    }
-
-    /**
-     * Creates an HttpOnly cookie for the JWT token.
-     *
-     * @param jwtToken The JWT token to store in the cookie.
-     * @return A Cookie object configured with HttpOnly and Secure settings.
-     */
-    private Cookie createJwtCookie(String jwtToken) {
-        Cookie jwtCookie = new Cookie("authToken", jwtToken);
-        jwtCookie.setHttpOnly(true); // Prevent access via JavaScript
-        jwtCookie.setSecure(false); // Use true in production to enforce HTTPS
-        jwtCookie.setPath("/"); // Available for all endpoints
-        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Set expiration (7 days)
-        jwtCookie.setDomain("localhost");
-        return jwtCookie;
     }
 
 }

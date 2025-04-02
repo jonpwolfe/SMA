@@ -75,7 +75,7 @@ public class CustomUserDetailsService implements UserDetailsService {
    }
 
    public User getUserByAuthToken(String authToken) {
-      String username = jwtUtils.getUsernameFromToken(authToken);
+      String username = jwtUtils.getUsername(authToken);
        Optional<User> optionalUser = userRepository.findByUsername(username);
        if (!optionalUser.isPresent()) {
            // Log the error for better tracking

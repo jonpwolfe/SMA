@@ -28,39 +28,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-    	 // Skip the OPTIONS request
-        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
-            filterChain.doFilter(request, response); // Just continue the filter chain without processing
-            return;
-        }
-        if (request.getRequestURI().startsWith("/auth")) {
-        	filterChain.doFilter(request, response);
-        	return;
-        }
-      String jwt = parseJwtFromCookies(request);
-           
-            try {
-                String username = jwtUtils.getUsernameFromToken(jwt); // Extract username from JWT
 
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // Remove "Bearer " prefix
+            try {
+                String username = jwtUtils.getUsername(token);
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                    if (jwtUtils.validateToken(jwt)) {
-                        UsernamePasswordAuthenticationToken authenticationToken =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    if (jwtUtils.isTokenValid(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 }
-            } catch (Exception e) {
-                System.err.println("Invalid JWT: " + e.getMessage());
+            } catch (Exception ex) {
+                logger.error("Invalid JWT", ex);
             }
-
+        }
         filterChain.doFilter(request, response);
-    }
-    /**
+    }    /**
      * Extract the JWT token from the "Authorization" header.
      *
      * @param request The HTTP request.

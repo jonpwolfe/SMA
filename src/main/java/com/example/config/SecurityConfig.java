@@ -55,19 +55,21 @@ public class SecurityConfig {
 
 
 
-	     @Bean
-	     CorsConfigurationSource corsConfigurationSource() {
-	         CorsConfiguration corsConfig = new CorsConfiguration();
-	         corsConfig.addAllowedOrigin("http://localhost:4200");  // Allow requests from Angular frontend
-	         corsConfig.addAllowedMethod(CorsConfiguration.ALL);  // Allow all HTTP methods (GET, POST, PUT, DELETE)
-	         corsConfig.addAllowedHeader(CorsConfiguration.ALL);  // Allow all headers
-	         corsConfig.setAllowCredentials(true);  // Allow credentials (cookies, authorization headers, etc.)
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+	    CorsConfiguration corsConfig = new CorsConfiguration();
+	    corsConfig.addAllowedOrigin("http://localhost:4200");  // Allow requests from Angular frontend
+	    corsConfig.addAllowedMethod(CorsConfiguration.ALL);  // Allow all HTTP methods (GET, POST, PUT, DELETE)
+	    corsConfig.addAllowedHeader(CorsConfiguration.ALL);  // Allow all headers
+	    corsConfig.addExposedHeader("Authorization");  // Expose the Authorization header to the frontend
+	    corsConfig.setAllowCredentials(true);  // Allow credentials (cookies, authorization headers, etc.)
 
-	         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	         source.registerCorsConfiguration("/**", corsConfig);
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", corsConfig);
 
-	         return source;
-	     }
+	    return source;
+	}
+
 
 	     @Bean
 	     AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) throws Exception {

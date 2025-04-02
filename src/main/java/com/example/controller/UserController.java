@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,31 +23,37 @@ public class UserController {
     public UserController(CustomUserDetailsService userService) {
         this.userService = userService;
     }
-
-    @GetMapping(produces="application/json")
-    public ResponseEntity<UserDto> getUserByCookie(@CookieValue(name = "authToken", required = false) String authToken) {
+    
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<UserDto> getUserByToken(@RequestHeader(name = "Authorization", required = false) String authorizationHeader) {
         try {
-            // Log the incoming auth token
-            logger.info("Received authToken: {}", authToken);
+            // Log the incoming Authorization header
+            logger.info("Received Authorization header: {}", authorizationHeader);
 
-            if (authToken == null || authToken.isEmpty()) {
-                logger.warn("Auth token is null or empty.");
-                return ResponseEntity.status(401).body(null); // Unauthorized if no cookie is provided
+            // Check if the Authorization header is missing or improperly formatted
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                logger.warn("Invalid or missing Authorization header.");
+                return ResponseEntity.status(401).body(null); // Unauthorized
             }
 
+            // Extract the JWT token (remove "Bearer " prefix)
+            String authToken = authorizationHeader.substring(7);
+            
             // Validate and fetch user based on the token
             User user = userService.getUserByAuthToken(authToken);
             if (user == null) {
                 logger.error("User not found for authToken: {}", authToken);
                 return ResponseEntity.status(404).body(null); // User not found
             }
+
             logger.info("User found: {}", user.getUsername());
             UserDto userDto = new UserDto(user);
-            return ResponseEntity.ok(userDto); // Return the user object
+            return ResponseEntity.ok(userDto);
         } catch (Exception e) {
-            logger.error("Error while processing authToken", e);
-            return ResponseEntity.status(500).body(null); // Handle unexpected server errors
+            logger.error("Error while processing Authorization token", e);
+            return ResponseEntity.status(500).body(null); // Internal server error
         }
     }
+
 
 }

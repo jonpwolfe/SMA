@@ -30,13 +30,9 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         try {
             // Call the AuthService to authenticate and generate the JWT token as a cookie
-            Cookie jwtCookie = authService.loginUser(loginRequest);
-
-            // Add the JWT cookie to the response
-            String cookieHeader = String.format("%s=%s; Path=%s; HttpOnly; SameSite=Lax", 
-                    jwtCookie.getName(), jwtCookie.getValue(), jwtCookie.getPath());
+            String jwtToken = authService.loginUser(loginRequest);
                 
-            response.addHeader("Set-Cookie",cookieHeader);
+            response.addHeader("Authorization", "Bearer " + jwtToken);
 
             // Prepare a JSON response
             Map<String, String> responseBody = new HashMap<>();
