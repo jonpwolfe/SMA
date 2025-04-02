@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.model.User;
+import com.example.model.UserDto;
 import com.example.service.CustomUserDetailsService;
 
 @RestController
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping(produces="application/json")
-    public ResponseEntity<User> getUserByCookie(@CookieValue(name = "authToken", required = false) String authToken) {
+    public ResponseEntity<UserDto> getUserByCookie(@CookieValue(name = "authToken", required = false) String authToken) {
         try {
             // Log the incoming auth token
             logger.info("Received authToken: {}", authToken);
@@ -39,12 +40,13 @@ public class UserController {
                 logger.error("User not found for authToken: {}", authToken);
                 return ResponseEntity.status(404).body(null); // User not found
             }
-
             logger.info("User found: {}", user.getUsername());
-            return ResponseEntity.ok(user); // Return the user object
+            UserDto userDto = new UserDto(user);
+            return ResponseEntity.ok(userDto); // Return the user object
         } catch (Exception e) {
             logger.error("Error while processing authToken", e);
             return ResponseEntity.status(500).body(null); // Handle unexpected server errors
         }
     }
+
 }
