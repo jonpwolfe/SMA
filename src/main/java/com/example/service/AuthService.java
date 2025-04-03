@@ -14,7 +14,6 @@ import com.example.model.LoginRequest;
 
 import com.example.util.JwtUtils;
 
-import jakarta.servlet.http.Cookie;
 
 @Service
 public class AuthService {
